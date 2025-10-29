@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const API_KEY = "9c3ed8ee95884dec979460a60f96675b";
+    // 🔑 Replace with your own GNews API key from https://gnews.io
+    const API_KEY = "45a658bbb6d7b6c1f06fc9aa62586477";
 
     const searchInput = document.getElementById('searchInput');
     const searchBtn = document.getElementById('searchBtn');
@@ -31,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
-        // Hamburger toggle
+        // 🍔 Hamburger toggle
         hamburgerMenu.addEventListener('click', function(e) {
             e.stopPropagation();
             mobileMenu.classList.toggle('active');
@@ -60,21 +61,25 @@ document.addEventListener('DOMContentLoaded', function() {
         getData(currentSearch);
     }
 
-    // Fetch news
+    // 📰 Fetch news (using GNews API)
     async function getData(searchTerm) {
         showLoadingState();
 
         try {
-            const response = await fetch(`https://newsapi.org/v2/everything?q=${searchTerm}&apiKey=${API_KEY}`);
+            const response = await fetch(
+                `https://gnews.io/api/v4/search?q=${encodeURIComponent(searchTerm)}&lang=en&country=in&max=12&apikey=${API_KEY}`
+            );
+
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
             const jsonData = await response.json();
-            if (jsonData.status === "ok") {
-                const articles = jsonData.articles.slice(0, 12);
-                displayNews(articles);
+
+            if (jsonData.articles && jsonData.articles.length > 0) {
+                displayNews(jsonData.articles);
             } else {
-                showErrorState('Failed to fetch news. Please try again.');
+                showErrorState('No news found for your search.');
             }
+
         } catch (error) {
             console.error("Error fetching news:", error);
             showErrorState('Failed to fetch news. Please check your connection.');
@@ -90,22 +95,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function displayNews(articles) {
-        if (!articles || articles.length === 0) {
-            showErrorState('No news found for your search.');
-            return;
-        }
-
-        const validArticles = articles.filter(article => article.urlToImage && article.title && article.url);
-
-        if (validArticles.length === 0) {
-            showErrorState('No valid news articles found.');
-            return;
-        }
-
         const cardContainer = document.createElement('div');
         cardContainer.className = 'cardContainer';
 
-        validArticles.forEach(article => {
+        articles.forEach(article => {
             const card = createNewsCard(article);
             cardContainer.appendChild(card);
         });
@@ -125,8 +118,8 @@ document.addEventListener('DOMContentLoaded', function() {
             : 'No description available.';
 
         card.innerHTML = `
-            <img src="${article.urlToImage}" alt="${article.title}" 
-                 onerror="this.src='https://via.placeholder.com/320x180/cccccc/666666?text=No+Image+Available'">
+            <img src="${article.image || 'https://via.placeholder.com/320x180/cccccc/666666?text=No+Image+Available'}" 
+                 alt="${article.title}">
             <div class="content">
                 <a class="title" href="${article.url}" target="_blank">${article.title}</a>
                 <p>${description}</p>
