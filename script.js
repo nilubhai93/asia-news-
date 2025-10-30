@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // 🔑 Replace with your own GNews API key from https://gnews.io
     const API_KEY = "45a658bbb6d7b6c1f06fc9aa62586477";
 
@@ -21,19 +21,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function setupEventListeners() {
         searchBtn.addEventListener('click', handleSearch);
-        searchInput.addEventListener('keypress', function(e) {
+        searchInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') handleSearch();
         });
 
         categoryBtns.forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 currentSearch = this.value;
                 getData(currentSearch);
             });
         });
 
         // 🍔 Hamburger toggle
-        hamburgerMenu.addEventListener('click', function(e) {
+        hamburgerMenu.addEventListener('click', function (e) {
             e.stopPropagation();
             mobileMenu.classList.toggle('active');
 
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Close when clicking outside
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (!hamburgerMenu.contains(e.target) && !mobileMenu.contains(e.target)) {
                 mobileMenu.classList.remove('active');
                 icon.classList.remove('fa-times');
@@ -67,7 +67,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             const response = await fetch(
-                `https://gnews.io/api/v4/search?q=${encodeURIComponent(searchTerm)}&lang=en&country=in&max=12&apikey=${API_KEY}`
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(
+                    `https://gnews.io/api/v4/search?q=${searchTerm}&lang=en&country=in&max=12&apikey=${API_KEY}`
+                )}`
             );
 
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -111,9 +113,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const card = document.createElement('div');
         card.className = 'card';
 
-        const description = article.description 
-            ? (article.description.length > 120 
-                ? article.description.substring(0, 120) + '...' 
+        const description = article.description
+            ? (article.description.length > 120
+                ? article.description.substring(0, 120) + '...'
                 : article.description)
             : 'No description available.';
 
